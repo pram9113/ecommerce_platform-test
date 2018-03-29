@@ -1,0 +1,337 @@
+<% layout('../backend-master.ejs') %>
+<script>
+    layer.load()
+
+    window.onload = function () {
+        layer.closeAll('loading')
+    }
+</script>
+<style>
+    .freight-fullname {
+        display: none;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 10px 10px 10px;
+        border: 1px solid #dedede;
+    }
+
+    .freight-intro {
+        color: #666;
+        overflow: hidden;
+    }
+
+    .freight-fullname ol ul, ul ul {
+        list-style-type: circle;
+    }
+
+    .freight-intro li {
+        float: left;
+        width: 280px;
+        overflow: hidden;
+        margin-left: 30px;
+        display: list-item;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        font-size: 100%;
+        font: inherit;
+        vertical-align: baseline;
+        box-sizing: border-box;
+        list-style-type: circle;
+        text-align: -webkit-match-parent;
+    }
+
+    .freight-intro strong {
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .top-arr {
+        position: relative;
+        top: -10px;
+        left: 720px;
+        width: 7px;
+        height: 5px;
+    }
+
+    .freight-intro ul {
+        list-style: disc;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        font-size: 100%;
+        font: inherit;
+        vertical-align: baseline;
+        -webkit-margin-before: 0px;
+        -webkit-margin-after: 0px;
+        display: block;
+        list-style-type: disc;
+        -webkit-margin-before: 1em;
+        -webkit-margin-after: 1em;
+        -webkit-margin-start: 0px;
+        -webkit-margin-end: 0px;
+        -webkit-padding-start: 40px;
+    }
+
+</style>
+<section class="content-header">
+    <h1>
+        管理运费模板
+        <small>Preview</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="main"><i class="fa fa-dashboard"></i> 首页</a></li>
+        <li><a href="#">运费</a></li>
+        <li class="active">管理运费模板</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="box box-info">
+        <div class="box-header with-border">
+            <div class="collapse navbar-collapse" id="navbar-collapse">
+                <div class="nav navbar-nav navbar-right">
+                    <li><a href="#FAQ">什么是运费模板？</a></li>
+                    <li><a href="#FAQ">在哪里能看到具体的运费？</a></li>
+                    <li><a class="f-view-more" href="#FAQ"
+                           target="_blank">更多运费模板帮助</a></li>
+                </div>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-lg-4" style="margin-bottom: 8px">
+                <a href="/admin/express_fee_template">
+                    <button class="btn btn-info">新增运费模板</button>
+                </a>
+            </div>
+            <div class="pull-right">
+                <a id="wuliu" style="text-decoration: none" name="true" onclick="showLine(this.name)">了解物流方式缩写展开</a>
+            </div>
+            <div class="col-lg-12">
+                <div id="freight-fullname" style="display: none" class="freight-fullname">
+                    <div class="top-arr"></div>
+                    <ul class="freight-intro">
+                        <ul>
+                            <li><strong>CHP</strong>: Swiss Post</li>
+                            <li><strong>CPAM</strong>: China Post Registered Air Mail</li>
+                            <li><strong>CPAP</strong>: China Post Air Parcel</li>
+                            <li><strong>DGM</strong>: DHL Global Mail</li>
+                            <li><strong>HKPAM</strong>: Hongkong Post Air Mail</li>
+                            <li><strong>HKPAP</strong>: Hongkong Post Air Parcel</li>
+                            <li><strong>Other</strong>: Seller's Shipping Method</li>
+                            <li><strong>SEP</strong>: Sweden Post</li>
+                            <li><strong>SF</strong>: SF Express</li>
+                            <li><strong>SGP</strong>: Singapore Post</li>
+                            <li><strong>UPSE</strong>: UPS Expedited™</li>
+                            <li><strong>UPSS</strong>: UPS Express Saver™</li>
+                            <li><strong>YANWEN JYT</strong>: China Post Ordinary Small Packet Plus</li>
+                            <li><strong>ZTORU</strong>: ZTO Express to Russia</li>
+                        </ul>
+                    </ul>
+                </div>
+            </div>
+            <table class="table table-bordered" id="express-template">
+                <thead>
+                <tr>
+                    <th width="20%">模板ID</th>
+                    <th width="40%">运费设置
+                        <span class="setting-help-icon ui-help ui-help-icon"></span>
+                    </th>
+                    <th width="40%">
+                        操作
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 物流公司列表-->
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+<!--<script type="text/javascript" src="/transport/express.js"></script>-->
+
+
+<script>
+    $(function () {
+
+        $.ajax({
+            type: 'GET',
+            url: '/admin/fee-express',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                data.msg.forEach(function (item) {
+                    var type = '';
+                    console.log(type)
+                    switch (item.type) {
+                        case 'parcel':
+                            type = '小包运输';
+                            break;
+                        case 'ordinary':
+                            type = '普通运输';
+                            break;
+                        case 'express':
+                            type = '特快运输';
+                            break;
+                    }
+
+                    if (item.type == 'parcel') {
+                        var myhtml = '<tr>'
+                            + '<td class="logistic-name" width="35%">' + item._id
+                            + '</td>'
+                            + '<td class="logistic-commit-standard" width="35%">'
+                            + '<span>' + type + '   </span>'
+                            + '<button class="btn btn-warning btn-xs" data-toggle="modal" data-target="#country_detail_' + item._id + '">查看国家详细</button>'
+                            + '</td>'
+                            + '<td width="30%">'
+                            + '<button class="btn btn-primary btn-xs" name="' + item.type + '" disabled="disabled" onclick="changeCountry(this.id,this.name)" id="' + item._id + '">删除</button>'
+                            + '</td>'
+                            + '</tr>';
+                        $('#express-template').append(myhtml);
+                    } else {
+                        var myhtml = '<tr>'
+                            + '<td class="logistic-name" width="35%">' + item._id
+                            + '</td>'
+                            + '<td class="logistic-commit-standard" width="35%">'
+                            + '<span>' + type + '   </span>'
+                            + '<button class="btn btn-warning btn-xs" data-toggle="modal" data-target="#country_detail_' + item._id + '">查看国家详细</button>'
+                            + '</td>'
+                            + '<td width="30%">'
+                            + '<button class="btn btn-primary btn-xs" name="' + item.type + '"  onclick="changeCountry(this.id,this.name)" id="' + item._id + '">删除</button>'
+                            + '</td>'
+                            + '</tr>';
+                        $('#express-template').append(myhtml);
+                    }
+
+
+                    var mycountry = '<div class="modal fade" id="country_detail_' + item._id + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">'
+                        + '<div class="modal-dialog" role="document">'
+                        + '<div class="modal-content">'
+                        + '<div class="modal-header">'
+                        + '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+                        + '<h4 class="modal-title" id="myModalLabel">国家运费规则</h4>'
+                        + '</div>'
+                        + '<div class="modal-body">'
+                        + '<table class="table table-bordered" id="express-template">'
+                        + '<thead>'
+                        + '<tr>'
+                        + '<th width="20%">规则ID</th>'
+                        + '<th width="40%">规则详细'
+                        + '<span class="setting-help-icon ui-help ui-help-icon"></span>'
+                        + '</th>'
+                        + '<th width="40%">操作</th>'
+                        + '</tr>'
+                        + '</thead>'
+                        + '<tbody>';
+                    item.country.forEach(function (country_item) {
+                        if (country_item != null) {
+                            var fee_status = country_item.free_ship.fee_status ? country_item.free_ship.fee_quantity + 'KG以上包邮' : "否";
+                            mycountry += '<tr>'
+                                + '<td>' + country_item._id
+                                + '</td>'
+                                + '<td>国家包括:' + country_item.country_name.join(',') + '<br>'
+                                + '预计<span>' + country_item.expected_delivery + '</span>天运达<br>'
+                                + '包邮:<span>' + fee_status + '</span>天运达'
+                                + '</td>'
+                                + '<td>'
+                                + '<button class="btn btn-primary btn-xs" name="' + item.type + '"  onclick="changeTemplate(this.id,this.name)" id="' + country_item._id + '">修改</button>'
+                                + '&nbsp'
+                                + '<button class="btn btn-danger btn-xs" name="' + item.type + '"  onclick="deleteTemplate(this.id,this.name)" id="' + country_item._id + '">刪除</button>'
+                                + '</td>'
+                                + '</tr>'
+                        }
+                    });
+
+                    mycountry += '</tbody>'
+                        + '</table>'
+                        + '</div>'
+                        + '<div class="modal-footer">'
+                        + '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>';
+                    $('.box-body').append(mycountry)
+
+                })
+
+
+            }
+        })
+    })
+    function showLine(name) {
+        if (name == "true") {
+            $('#freight-fullname').css('display', 'block')
+            $('#wuliu').attr("name", 'false')
+        } else if (name == "false") {
+            $('#freight-fullname').css('display', 'none')
+            $('#wuliu').attr("name", "true")
+        }
+    }
+
+    function changeTemplate(id, type) {
+        console.log(id)
+        $.ajax({
+            url: '/admin/template',
+            type: 'get',
+            data: {
+                id: id,
+                type: type
+            },
+            success: function (data) {
+                if (data.succeed) {
+                    console.log(data)
+                    window.location = data.page
+                }
+            },
+            error: function () {
+
+            }
+        })
+    }
+
+    function deleteTemplate(id, type) {
+
+        $.ajax({
+            url: '/admin/template',
+            type: 'put',
+            data: {
+                id: id,
+                type: type
+            },
+            success: function (data) {
+                if (data.succeed) {
+                    $('#' + id).parent().parent().remove()
+                }
+            },
+            error: function () {
+
+            }
+        })
+    }
+
+    function changeCountry(id, type) {
+        $.ajax({
+            url: '/admin/fee/template',
+            type: 'put',
+            data: {
+                id: id,
+                type: type
+            },
+            success: function (data) {
+                if (data.succeed) {
+                    layer.msg("删除成功")
+                    $('#' + id).parent().parent().remove()
+                } else {
+                    layer.msg("删除失败")
+                }
+            },
+            error: function () {
+
+            }
+        })
+    }
+</script>
+
